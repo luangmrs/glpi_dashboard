@@ -2,16 +2,16 @@ import { json } from '@sveltejs/kit';
 import { login } from '$lib/glpi';
 
 export async function POST({ request, cookies }) {
-  const { login, password } = await request.json();
+  const { user, password } = await request.json();
 
-  if (!login || !password) {
+  if (!user || !password) {
     return json({ 
       success: false, 
       error: 'Login e senha obrigatórios' 
     }, { status: 400 });
   }
 
-  const result = await login(login, password);
+  const result = await login(user, password);
 
   if (result.success) {
     // Guarda session token em cookie httpOnly (seguro)
