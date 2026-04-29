@@ -1,11 +1,12 @@
 import { GLPI_URL } from '$env/static/private';
-
+import https from "https";
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 /**
  * Fetch com glpi
  */
+
 async function glpiFetch(endpoint, options = {}) {
   const url = `${GLPI_URL}/apirest.php${endpoint}`;
-  
   const headers = {
     'Content-Type': 'application/json',
     ...options.headers
@@ -13,7 +14,8 @@ async function glpiFetch(endpoint, options = {}) {
 
   const response = await fetch(url, {
     ...options,
-    headers
+    headers,
+    
   });
 
   if (response.status === 401) {
@@ -31,12 +33,12 @@ async function glpiFetch(endpoint, options = {}) {
 /**
  * Login com credenciais do usuário
  */
-export async function login(login, password) {
-  const authHeader = `Basic ${Buffer.from(`${login}:${password}`).toString('base64')}`;
-
+export async function login(user, password) {
+  const authHeader = `Basic ${Buffer.from(`${user}:${password}`).toString('base64')}`;
+  
   try {
     const data = await glpiFetch('/initSession', {
-      method: 'GET',
+      method: 'POST',
       headers: {
         'Authorization': authHeader
       }

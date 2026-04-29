@@ -1,7 +1,7 @@
 <script>
   import { goto } from '$app/navigation';
   
-  let login = $state('');
+  let user = $state('');
   let password = $state('');
   let loading = $state(false);
   let errorMsg = $state('');
@@ -14,9 +14,9 @@
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ login, password })
+        body: JSON.stringify({ user, password })
       });
-
+    
       const data = await res.json();
 
       if (data.success) {
@@ -33,7 +33,7 @@
 </script>
 
 <svelte:head>
-  <title>Login - Dashboard QA</title>
+  <title>Login - Dashboard</title>
 </svelte:head>
 
 <main class="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50 flex items-center justify-center p-4 font-inter">
@@ -44,9 +44,9 @@
       
       <!-- Header -->
       <div class="text-center mb-8">
-        <div class="text-5xl mb-3">🎯</div>
+        <div class="text-5xl mb-3"></div>
         <h1 class="font-poppins text-2xl font-bold text-gray-900">
-          Dashboard QA
+          Tickets GLPI
         </h1>
         <p class="text-gray-500 text-sm mt-2">
           Faça login com suas credenciais GLPI
@@ -64,7 +64,7 @@
           <input
             id="login"
             type="text"
-            bind:value={login}
+            bind:value={user}
             disabled={loading}
             placeholder="seu.usuario"
             class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition disabled:bg-gray-50 disabled:cursor-not-allowed"
