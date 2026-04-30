@@ -78,16 +78,37 @@ export async function killSession(sessionToken) {
 /**
  * Buscar tickets (exemplo uso session)
  */
-export async function getTickets(sessionToken, range = '0-50') {
+export async function pesquisarTicketsFiltro(sessionToken) {
+  
+  const params = new URLSearchParams({
+    // status do ticket
+    'criteria[0][field]': '12',
+    'criteria[0][searchtype]': 'equals',
+    'criteria[0][value]': 'notold',
+    
+    // status da tarefa
+    'criteria[1][link]': 'AND',
+    'criteria[1][field]': '33',
+    'criteria[1][searchtype]': 'equals',
+    'criteria[1][value]': '1',
+    
+    // grupo atribuído
+    'criteria[2][link]': 'AND',
+    'criteria[2][field]': '112',
+    'criteria[2][searchtype]': 'contains',
+    'criteria[2][value]': 'qualidade funcional'
+  });
+
   try {
-    const data = await glpiFetch('/Ticket', {
+    const data = await glpiFetch(`/search/Ticket?${params.toString()}`, {
       method: 'GET',
       headers: {
-        'Session-Token': sessionToken,
-        'Range': range
+        'Session-Token': sessionToken
       }
     });
-    return { success: true, tickets: data };
+    
+    // O /search retorna os resultados dentro de um array chamado "data"
+    return { success: true, tickets: data.data || [] };
   } catch (error) {
     return { success: false, error: error.message };
   }

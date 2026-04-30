@@ -50,6 +50,7 @@
     <section class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
       <h2 class="font-poppins text-lg font-semibold mb-4 text-gray-800">
         Próximos Passos
+        <br>
       </h2>
       <ul class="space-y-3">
         <li class="flex items-center gap-2 text-gray-600">
