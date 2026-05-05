@@ -1,6 +1,8 @@
 <script>
+  import { PUBLIC_GLPI_URL } from '$env/static/public';
   import './page.css';
   import { extractPlainText } from '$lib/utils.js';
+	
   let { data } = $props();
 
   let selectedTicket = $state(null);
@@ -217,7 +219,7 @@
       <!-- Footer -->
       <div class="px-7 py-4 border-t border-gray-200 flex justify-between flex-shrink-0">
        <button
-          onclick={() => window.open(`${env.BASE_URL}front/ticket.form.php?id=${selectedTicket['2']}`, '_blank')}
+          onclick={() => window.open(`${PUBLIC_GLPI_URL}/front/ticket.form.php?id=${selectedTicket['2']}`, '_blank')}
           class="font-poppins text-lg font-bold bg-amber-500 text-gray-950 px-5 py-2 w-3/6 rounded-lg hover:bg-gray-200 transition-transform hover:scale-105"
         >
           Abrir no GLPI
