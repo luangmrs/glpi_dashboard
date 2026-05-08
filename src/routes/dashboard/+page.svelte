@@ -113,8 +113,8 @@
           
             <div class="p-4 flex flex-col gap-3 flex-1">
               <!-- ID + Status -->
-              <div class="flex items-center justify-between">
-                <span class="font-poppins text-lg font-semibold tracking-wider text-amber-500 border-amber-500 border bg-gray-100 px-2.5 py-0.5 rounded-full">
+              <div class="flex items-center justify-between ">
+                <span class="font-poppins text-lg font-semibold tracking-wider text-amber-500 border-amber-500 border bg-gray-50 px-2.5 py-0.5 rounded-full shadow-md">
                   #{ticket['2']}
                 </span>
 
@@ -133,7 +133,7 @@
               <hr class="border-gray-100" />
 
               <!-- Solicitante / Executor -->
-              <div class="flex justify-center text-center p-">  
+              <div class="flex justify-center text-center py-0.5">  
                 <div>
                   <p class="text-[10px] font-semibold text-gray-700 uppercase tracking-wide">Última alteração</p>
                   <!-- lógica futura -->
@@ -186,7 +186,7 @@
       <!-- Header do modal -->
       <div class="flex items-start justify-between gap-4 px-7 pt-6 pb-4 border-b border-gray-100 flex-shrink-0">
         <div class="flex items-center gap-3 flex-wrap">
-          <span class="font-poppins text-xl font-semibold  text-amber-500 bg-gray-200 rounded-r-xl px-3 py-1 ">
+          <span class="font-poppins text-lg font-semibold tracking-wider text-amber-500 border-amber-500 border bg-gray-50 px-2.5 py-0.5 rounded-full shadow-md">
             #{selectedTicket['2']}
           </span>
     
