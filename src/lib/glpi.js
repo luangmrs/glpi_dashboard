@@ -96,7 +96,10 @@ export async function pesquisarTicketsFiltro(sessionToken) {
     'criteria[2][link]': 'AND',
     'criteria[2][field]': '112',
     'criteria[2][searchtype]': 'contains',
-    'criteria[2][value]': 'qualidade funcional'
+    'criteria[2][value]': 'qualidade funcional',
+
+    'forcedisplay[1]': '64',
+    'forcedisplay[2]': '21',
   });
 
   try {
