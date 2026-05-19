@@ -1,27 +1,47 @@
 <script>
-  import { PUBLIC_GLPI_URL } from '$env/static/public';
+  import { PUBLIC_GLPI_URL, PUBLIC_AMBIENTES, PUBLIC_TESTER } from '$env/static/public';
   import './page.css';
   import { extractPlainText } from '$lib/utils.js';
 	
   let { data } = $props();
 
+  const AMBIENTES = PUBLIC_AMBIENTES;
+  const TESTADORES = PUBLIC_TESTER;
+
+  let ticketMeta = $state(data.ticketMeta || []);
+
+  async function setMeta(ticketId, field, value) {
+    ticketMeta = { ...ticketMeta, [ticketId]: { ...ticketMeta[ticketId], [field]: value } };
+    await fetch('/api/meta', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ticketId, field, value })
+    });
+  }
+
+  // Filtros
+  let filtroId = $state('');
+  let filtroAmbiente = $state('');
+  let filtroTestador = $state('');
+
+   let ticketsFiltrados = $derived(data.tickets.filter(t => {
+    const id = String(t['2'] || '');
+    const meta = ticketMeta[id] || {};
+    if (filtroId && !id.includes(filtroId.trim())) return false;
+    if (filtroAmbiente && meta.ambiente !== filtroAmbiente) return false;
+    if (filtroTestador && meta.testador !== filtroTestador) return false;
+    return true;
+  }));
+
   let selectedTicket = $state(null);
 
-  function openModal(ticket) {
-    selectedTicket = ticket;
-  }
+  function openModal(ticket) { selectedTicket = ticket; }
 
-  function closeModal() {
-    selectedTicket = null;
-  }
+  function closeModal() { selectedTicket = null; }
 
-  function onBackdropClick(e) {
-    if (e.target === e.currentTarget) closeModal();
-  }
+  function onBackdropClick(e) { if (e.target === e.currentTarget) closeModal(); }
 
-  function onKeydown(e) {
-    if (e.key === 'Escape') closeModal();
-  }
+  function onKeydown(e) { if (e.key === 'Escape') closeModal(); }
 </script>
 
 <svelte:head>
@@ -67,20 +87,23 @@
         <input
           type="text"
           placeholder="Buscar ID..."
+          bind:value={filtroId}
           class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none block px-3 py-2 transition-all"
         />
       </div>
 
-      <select class="bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none block px-3 py-2 transition-all w-full md:w-auto cursor-pointer">
-        <option value="">Ambiente (Todos)</option>
-        <option value="homologacao">Homologação</option>
-        <option value="producao">Produção</option>
+      <select bind:value={filtroAmbiente} class="bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none block px-3 py-2 transition-all w-full md:w-auto cursor-pointer">
+       <option value="">Ambiente (Todos)</option>
+        {#each AMBIENTE as ambiente}
+        <option value={ambiente}>{ambiente}</option>
+       {/each}
       </select>
 
-      <select class="bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none block px-3 py-2 transition-all w-full md:w-auto cursor-pointer">
+      <select bind:value={filtroTestador} class="bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none block px-3 py-2 transition-all w-full md:w-auto cursor-pointer">
         <option value="">Testador (Todos)</option>
-        <option value="com_testador">Atribuído</option>
-        <option value="sem_testador">Não Atribuído</option>
+       {#each TESTADORES as testador}
+        <option value={testador}>{testador}</option>
+        {/each}
       </select>
       
     </div>
@@ -102,7 +125,9 @@
     {:else}
       <!-- Grid de cards -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-        {#each data.tickets as ticket}
+        {#each ticketsFiltrados as ticket}
+        {@const ticketId = String(ticket['2'])}
+        {@const meta = ticketMeta[ticketId] || {}}}
           <button
             type="button"
             onclick={() => openModal(ticket)}
@@ -144,16 +169,32 @@
               <hr class="border-gray-100" />
 
               <!-- Ambiente + Testador -->
-              <div class="flex flex-col gap-1.5">
+              <div class="flex flex-col gap-1.5" role="none" onclick={(e) => e.stopPropagation()}>
                 <div>
                   <p class="text-[10px] font-semibold text-gray-800 uppercase tracking-wide">Ambiente de Homologação</p>
-                  <!-- lógica futura -->
-                  <p class="text-xs text-gray-400 italic mt-0.5">— não definido</p>
+                  <select
+                    value={meta.ambiente || ''}
+                    onchange={(e) => setMeta(ticketId, 'ambiente', e.target.value)}
+                    class="w-full text-xs border border-gray-200 rounded-lg px-2 py-1 bg-gray-50 focus:ring-2 focus:ring-emerald-400 outline-none cursor-pointer"
+                  >
+                    <option value="">— não definido</option>
+                    {#each AMBIENTES as a}
+                      <option value={a}>{a}</option>
+                    {/each}
+                  </select>
                 </div>
                 <div>
                   <p class="text-[10px] font-semibold text-gray-800 uppercase tracking-wide">Testador</p>
-                  <!-- lógica futura -->
-                  <p class="text-xs text-gray-400 italic mt-0.5">— não atribuído</p>
+                  <select
+                    value={meta.testador || ''}
+                    onchange={(e) => setMeta(ticketId, 'testador', e.target.value)}
+                    class="w-full text-xs border border-gray-200 rounded-lg px-2 py-1 bg-gray-50 focus:ring-2 focus:ring-sky-400 outline-none cursor-pointer"
+                  >
+                    <option value="">— não atribuído</option>
+                    {#each TESTADORES as t}
+                      <option value={t}>{t}</option>
+                    {/each}
+                  </select>
                 </div>
               </div>
             </div>
@@ -223,13 +264,29 @@
         <div class="grid grid-cols-2 gap-4">
           <div class="bg-emerald-50 border border-green-200 rounded-xl p-4">
             <p class="text-[10px] text-center font-semibold text-emerald-600 uppercase tracking-widest mb-1">Ambiente de Homologação</p>
-            <!-- lógica futura -->
-            <p class="text-sm text-gray-400 italic">— não definido</p>
+             <select
+              value={ticketMeta[String(selectedTicket['2'])]?.ambiente || ''}
+              onchange={(e) => setMeta(String(selectedTicket['2']), 'ambiente', e.target.value)}
+              class="w-full text-sm border border-green-200 rounded-lg px-2 py-1.5 bg-white focus:ring-2 focus:ring-emerald-400 outline-none cursor-pointer"
+            >
+              <option value="">— não definido</option>
+              {#each AMBIENTES as a}
+                <option value={a}>{a}</option>
+              {/each}
+            </select>
           </div>
           <div class="bg-sky-50 border border-sky-100 rounded-xl p-4">
             <p class="text-[10px] text-center font-semibold text-sky-700 uppercase tracking-widest mb-1">Testador</p>
-            <!-- lógica futura -->
-            <p class="text-sm text-gray-400 italic">— não atribuído</p>
+           <select
+              value={ticketMeta[String(selectedTicket['2'])]?.testador || ''}
+              onchange={(e) => setMeta(String(selectedTicket['2']), 'testador', e.target.value)}
+              class="w-full text-sm border border-sky-200 rounded-lg px-2 py-1.5 bg-white focus:ring-2 focus:ring-sky-400 outline-none cursor-pointer"
+            >
+              <option value="">— não atribuído</option>
+              {#each TESTADORES as t}
+                <option value={t}>{t}</option>
+              {/each}
+            </select>
           </div>
         </div>
 
