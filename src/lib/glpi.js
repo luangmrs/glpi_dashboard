@@ -1,4 +1,4 @@
-import { GLPI_URL } from '$env/static/private';
+import { PUBLIC_GLPI_URL } from '$env/static/public';
 import https from "https";
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 /**
@@ -6,7 +6,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
  */
 
 async function glpiFetch(endpoint, options = {}) {
-  const url = `${GLPI_URL}/apirest.php${endpoint}`;
+  const url = `${PUBLIC_GLPI_URL}/apirest.php${endpoint}`;
   const headers = {
     'Content-Type': 'application/json',
     ...options.headers

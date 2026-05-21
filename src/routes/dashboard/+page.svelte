@@ -5,8 +5,8 @@
 	
   let { data } = $props();
 
-  const AMBIENTES = PUBLIC_AMBIENTES;
-  const TESTADORES = PUBLIC_TESTER;
+  const AMBIENTES = PUBLIC_AMBIENTES.split(',');
+  const TESTADORES = PUBLIC_TESTER.split(',');
 
   let ticketMeta = $state(data.ticketMeta || []);
 
@@ -94,7 +94,7 @@
 
       <select bind:value={filtroAmbiente} class="bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none block px-3 py-2 transition-all w-full md:w-auto cursor-pointer">
        <option value="">Ambiente (Todos)</option>
-        {#each AMBIENTE as ambiente}
+        {#each AMBIENTES as ambiente}
         <option value={ambiente}>{ambiente}</option>
        {/each}
       </select>
@@ -127,7 +127,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
         {#each ticketsFiltrados as ticket}
         {@const ticketId = String(ticket['2'])}
-        {@const meta = ticketMeta[ticketId] || {}}}
+        {@const meta = ticketMeta[ticketId] || {}}
           <button
             type="button"
             onclick={() => openModal(ticket)}
